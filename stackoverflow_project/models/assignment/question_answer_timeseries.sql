@@ -1,5 +1,5 @@
 -- models/question_answer_timeseries.sql
-
+{{ config(materialized='table') }}
 WITH question_answer_times AS (
   SELECT 
     q.creationdate AS question_date,

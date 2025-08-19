@@ -1,5 +1,5 @@
 -- models/questions_with_replies.sql
-
+{{ config(materialized='table') }}
 WITH user_replies AS (
   SELECT 
     c.postid,
