@@ -6,8 +6,8 @@ WITH user_replies AS (
     c.userid AS reply_user_id,
     p.OwnerUserId AS question_user_id,
     p.body
-  FROM {{ source('stackoverflow', 'comments') }} c
-  JOIN {{ source('stackoverflow', 'posts') }} p
+  FROM {{ ref('comments') }} c
+  JOIN {{ ref('posts') }} p
     ON c.postid = p.id
   WHERE p.posttypeid = 1  -- Only questions
 )
