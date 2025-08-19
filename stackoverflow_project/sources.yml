@@ -1,0 +1,32 @@
+version: 2
+sources:
+  - name: stackoverflow
+    tables:
+      - name: comments
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/comments.parquet"
+          file_format: parquet
+      - name: posts
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/posts.parquet"
+          file_format: parquet
+      - name: votes
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/votes.parquet"
+          file_format: parquet
+      - name: users
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/users.parquet"
+          file_format: parquet
+      - name: badges
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/badges.parquet"
+          file_format: parquet
+      - name: post_links
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/post_links.parquet"
+          file_format: parquet
+      - name: tags
+        config:
+          external_location: "s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/tags.parquet"
+          file_format: parquet
