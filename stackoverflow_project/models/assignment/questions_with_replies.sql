@@ -1,18 +1,27 @@
 -- models/questions_with_replies.sql
 {{ config(materialized='table') }}
-WITH user_replies AS (
-  SELECT 
-    c.postid,
-    c.userid AS reply_user_id,
-    p.OwnerUserId AS question_user_id,
-    p.body
-  FROM {{ ref('comments') }} c
-  JOIN {{ ref('posts') }} p
-    ON c.postid = p.id
-  WHERE p.posttypeid = 1  -- Only questions
+WITH question_askers AS (
+    SELECT Id AS QuestionId, OwnerUserId
+    FROM {{ ref('posts') }} 
+    WHERE PostTypeId = 1
+),
+answers AS (
+    SELECT ParentId AS QuestionId, Id AS AnswerId
+    FROM {{ ref('posts') }} 
+    WHERE PostTypeId = 2
+),
+all_post_ids AS (
+    SELECT QuestionId FROM question_askers
+    UNION
+    SELECT AnswerId FROM answers
+),
+comment_mentions AS (
+    SELECT c.PostId, c.Text, c.UserId
+    FROM {{ ref('comments') }}  AS c
+    WHERE c.Text LIKE '@%'
 )
-SELECT 
-  COUNT(DISTINCT ur.postid) AS reply_count
-FROM user_replies ur
-WHERE ur.reply_user_id != ur.question_user_id  -- Only replies to others, not the original poster
-  AND ur.body LIKE '%<>%'  -- <p> indicates a reply
+SELECT COUNT(DISTINCT q.QuestionId)
+FROM question_askers AS q
+JOIN all_post_ids AS p ON p.QuestionId = q.QuestionId
+JOIN comment_mentions AS cm ON cm.PostId = p.QuestionId AND cm.UserId = q.OwnerUserId
+
