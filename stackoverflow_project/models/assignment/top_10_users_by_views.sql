@@ -1,5 +1,5 @@
 -- models/top_10_users_by_views.sql
-
+{{ config(materialized='table') }}
 WITH user_views AS (
     SELECT 
         p.id,
