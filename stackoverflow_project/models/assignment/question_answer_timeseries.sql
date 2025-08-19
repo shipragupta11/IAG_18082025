@@ -6,8 +6,8 @@ WITH question_answer_times AS (
     a.creationdate AS answer_date,
    -- Calculate the difference in seconds
     EXTRACT(EPOCH FROM (a.creationdate - q.creationdate)) AS time_diff_seconds
-  FROM {{ source('stackoverflow', 'posts') }} q
-  JOIN {{ source('stackoverflow', 'posts') }} a
+  FROM {{ ref('posts') }} q
+  JOIN {{ ref('posts') }} a
     ON q.id = a.acceptedanswerid
   WHERE q.posttypeid = 1  -- Only questions
     AND a.posttypeid = 2  -- Only answers
