@@ -5,7 +5,7 @@ WITH user_views AS (
         p.id,
         SUM(p.viewcount) AS total_views
     FROM {{ ref('posts') }} p
-    WHERE p.PostTypeId = 'question'
+    WHERE p.PostTypeId = 1
     GROUP BY p.id
 )
 SELECT 
