@@ -2,34 +2,24 @@
 {{ config(materialized='table') }}
 WITH question_answer_times AS (
   SELECT 
-    q.creationdate AS question_date,
-    a.creationdate AS answer_date,
-   -- Calculate the difference in seconds
-    EXTRACT(EPOCH FROM (a.creationdate - q.creationdate)) AS time_diff_seconds
+        q.Id AS QuestionId,
+        q.CreationDate AS QuestionCreated,
+        a.CreationDate AS AcceptedAnswerCreated,
+        JULIAN(a.CreationDate) * 86400 - JULIAN(q.CreationDate) * 86400 AS time_to_accept
+
   FROM {{ ref('posts') }} q
   JOIN {{ ref('posts') }} a
-    ON q.id = a.acceptedanswerid
-  WHERE q.posttypeid = 1  -- Only questions
-    AND a.posttypeid = 2  -- Only answers
-),
-time_bands AS (
-  SELECT 
-    question_date,
-    CASE
-      WHEN time_diff_seconds < 60 THEN '<1 min'
-      WHEN time_diff_seconds BETWEEN 60 AND 300 THEN '1-5 mins'
-      WHEN time_diff_seconds BETWEEN 301 AND 3600 THEN '5 mins-1 hour'
-      WHEN time_diff_seconds BETWEEN 3601 AND 10800 THEN '1-3 hours'
-      WHEN time_diff_seconds BETWEEN 10801 AND 86400 THEN '3 hours-1 day'
-      ELSE '>1 day'
-    END AS time_band
-  FROM question_answer_times
+    ON q.AcceptedAnswerId = a.Id
+    WHERE q.PostTypeId = 1 AND q.AcceptedAnswerId IS NOT NULL
 )
-SELECT 
-  DATE_TRUNC('month', question_date) AS month,
-  time_band,
-  COUNT(*) AS question_count
-FROM time_bands
-GROUP BY month, time_band
-ORDER BY month, time_band
-
+  SELECT 
+    STRFTIME('%Y-%m', sub.QuestionCreated) AS Month,
+    COUNT(CASE WHEN time_to_accept < 60 THEN 1 END) AS "Under 1 min",
+    COUNT(CASE WHEN time_to_accept >= 60 AND time_to_accept < 300 THEN 1 END) AS "1-5 mins",
+    COUNT(CASE WHEN time_to_accept >= 300 AND time_to_accept < 3600 THEN 1 END) AS "5 mins-1 hour",
+    COUNT(CASE WHEN time_to_accept >= 3600 AND time_to_accept < 10800 THEN 1 END) AS "1-3 hours",
+    COUNT(CASE WHEN time_to_accept >= 10800 AND time_to_accept < 86400 THEN 1 END) AS "3 hours-1 day",
+    COUNT(CASE WHEN time_to_accept >= 86400 THEN 1 END) AS "Over 1 day"
+  FROM question_answer_times sub
+  GROUP BY month
+  ORDER BY month
