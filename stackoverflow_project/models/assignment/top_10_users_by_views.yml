@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: top_10_users_by_views
+    description: Finds the top 10 users based on the total views of the questions they have posted.
+    columns:
+      - name: id
+        description: User ID
+        tests:
+          - not_null
+          - unique
+      - name: displayname
+        description: Display name of the user
+        tests:
+          - not_null
+      - name: total_views
+        description: Total views on questions posted by the

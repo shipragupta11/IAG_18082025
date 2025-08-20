@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: question_answer_timeseries
+    description: Shows a time series of question counts with banding based on the time between posting a question and its accepted answer.
+    columns:
+      - name: Month
+        description: Year and month of the question creation date
+        tests:
+          - not_null
