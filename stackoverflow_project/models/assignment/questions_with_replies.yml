@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: questions_with_replies
+    description: Counts how many questions have @replies from the original asker to other users,
+      either on the question or any of its answers.
+    columns:
+      - name: questions_with_replies
+        description: Number of such questions
+        tests:
+          - not_null
